@@ -12,15 +12,6 @@ jobs:
       # options: "--workdir /project"
     env:
       DB_HOST: "db"
-    # services:
-    #   db:
-    #     image: mysql:5.7
-    #     env:
-    #       MYSQL_ROOT_PASSWORD: root
-    #       MYSQL_DATABASE: oxid
-    #     ports:
-    #       - 3306
-    #     options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
     - uses: actions/checkout@v1
 
@@ -47,14 +38,11 @@ jobs:
         name: oxid-with-deps
         path: oxid.tar.gz
 
-  build:
+  unit_tests:
     runs-on: ubuntu-latest
     needs: install
     container:
       image: oxidesales/oxideshop-docker-php:7.4
-      # volumes:
-      #   - ${{ github.workspace }}/oxid:/project
-      #   - ${{ github.workspace }}/dummy-module:/project/project-modules/dummy-module
     steps:
     - uses: actions/checkout@v1
     - name: Download a single artifact
@@ -75,10 +63,43 @@ jobs:
       run: vendor/bin/phpunit --testsuite unit-tests
       working-directory: /__w/oxid
 
-    # - name: add project module folder
-    #   run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
-    #   working-directory: /__w/oxid
+  integration_tests:
+    runs-on: ubuntu-latest
+    needs: install
+    container:
+      image: oxidesales/oxideshop-docker-php:7.4
+    env:
+      DB_NAME:oxid
+      DB_HOST:db
+      DB_USER:root
+      DB_PASS:root
+    services:
+      db:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: oxid
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download a single artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: oxid-with-deps
 
-    # - name: require module
-    #   run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
-    #   working-directory: /__w/oxid
+    - name: extract temp artifact
+      run: |
+        tar xzf oxid.tar.gz && mv oxid /__w
+
+    - name: prepare autoload
+      run: |
+        bin/symlinkProjectModules.sh
+        bin/createModuleAutoload.sh
+        cp config.inc.php-dist source/config.inc.php
+      working-directory: /__w/oxid
+
+    - name: run integration tests
+      run: vendor/bin/phpunit --prepend source/bootstrap.php --testsuite integration-tests
+      working-directory: /__w/oxid
