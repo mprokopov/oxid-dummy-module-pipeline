@@ -69,10 +69,10 @@ jobs:
     container:
       image: oxidesales/oxideshop-docker-php:7.4
     env:
-      DB_NAME:oxid
-      DB_HOST:db
-      DB_USER:root
-      DB_PASS:root
+      DB_NAME: oxid
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: root
     services:
       db:
         image: mysql:5.7
