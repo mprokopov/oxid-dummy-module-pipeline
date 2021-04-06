@@ -7,8 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: composer:1.10.17
-      volumes:
-        - ${{ github.workspace }}/oxid:/project
+      # volumes:
+      #   - ${{ github.workspace }}/oxid:/project
       # options: "--workdir /project"
     env:
       DB_HOST: "db"
@@ -25,11 +25,10 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: install
-      run: composer create-project mprokopov/test-oxid-docker /project --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
+      run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
     - name: zip temp artifact
       run: |
-        cd /project
-        tar czf oxid.tar.gz ./
+        cd /__w/oxid && tar czf oxid.tar.gz ./
 
     - name: Upload oxid-with-deps
       uses: actions/upload-artifact@v2
@@ -42,9 +41,9 @@ jobs:
     needs: install
     container:
       image: composer:1.10.17
-      volumes:
-        - ${{ github.workspace }}/oxid:/project
-        - ${{ github.workspace }}/dummy-module:/project/project-modules/dummy-module
+      # volumes:
+      #   - ${{ github.workspace }}/oxid:/project
+      #   - ${{ github.workspace }}/dummy-module:/project/project-modules/dummy-module
     steps:
     - uses: actions/checkout@v1
     - name: Download a single artifact
@@ -54,11 +53,11 @@ jobs:
         path: ~/oxid
     - name: extract temp artifact
       run: |
-        cd /project/oxid
-        tar xzf oxid.tar.gz
+        mkdir -p /__w/oxid && mv oxid.tar.gz /__w/oxid
+        cd /__w/oxid &&tar xzf oxid.tar.gz
 
     - name: add project module folder
-      run: composer config repositories.build path /project/project-modules/\*
+      run: cd /__w/oxid && composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
 
     - name: require module
-      run: composer require --no-interaction oxid-professional-services/dummy
+      run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
