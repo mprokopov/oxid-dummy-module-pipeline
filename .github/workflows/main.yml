@@ -28,7 +28,9 @@ jobs:
       run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
 
     - name: add project module folder
-      run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+      run: |
+        mkdir -p project-modules && cp /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/* project-modules 
+        composer config repositories.build path /__w/oxid/project-modules/\*
       working-directory: /__w/oxid
 
     - name: require module
