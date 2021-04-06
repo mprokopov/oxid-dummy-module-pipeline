@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: oxid
-        path: oxid
+        path: /project/oxid
 
   build:
     runs-on: ubuntu-latest
