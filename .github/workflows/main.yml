@@ -28,7 +28,7 @@ jobs:
       run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
     - name: zip temp artifact
       run: |
-        tar czf oxid.tar.gz /__w/oxid 
+        tar czf oxid.tar.gz --directory /__w oxid 
 
     - name: Upload oxid-with-deps
       uses: actions/upload-artifact@v2
@@ -50,14 +50,14 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: oxid-with-deps
-        path: ~/oxid
     - name: extract temp artifact
       run: |
-        mkdir -p /__w/oxid && mv oxid.tar.gz /__w/oxid
-        cd /__w/oxid &&tar xzf oxid.tar.gz
+        tar xzf oxid.tar.gz && mv oxid /__w
 
     - name: add project module folder
-      run: cd /__w/oxid && composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+      run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+      working-directory: /__w/oxid
 
     - name: require module
       run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
+      working-directory: /__w/oxid
