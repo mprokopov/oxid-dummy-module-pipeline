@@ -9,6 +9,7 @@ jobs:
       image: composer:1.10.17
       volumes:
         - /home/runner/work/oxid:/project
+        - /home/runner/work/dummy-module:/project/project-modules/dummy-module
       options: "--workdir /project"
     env:
       DB_HOST: "db"
@@ -26,3 +27,9 @@ jobs:
 
     - name: install
       run: composer create-project mprokopov/test-oxid-docker /project --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
+
+    - name: add project module folder
+      run: composer config repositories.build path /project/project-modules/\*
+
+    - name: require module
+      run: composer require --no-interaction oxid-professional-services/dummy
