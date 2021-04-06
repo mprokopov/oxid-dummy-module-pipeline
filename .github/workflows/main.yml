@@ -100,6 +100,12 @@ jobs:
         cp config.inc.php-dist source/config.inc.php
       working-directory: /__w/oxid
 
+    - name: prepare db dump
+      run: |
+        composer ci:prep:db
+        composer ci:prep:integration
+      working-directory: /__w/oxid
+
     - name: run integration tests
       run: vendor/bin/phpunit --prepend source/bootstrap.php --testsuite integration-tests
       working-directory: /__w/oxid
