@@ -8,7 +8,7 @@ jobs:
     container:
       image: composer:1.10.17
       volumes:
-        - $GITHUB_WORKSPACE/oxid:/project
+        - $(pwd)/oxid:/project
     env:
       DB_HOST: "db"
     # services:
