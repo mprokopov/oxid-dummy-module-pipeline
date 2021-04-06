@@ -38,6 +38,31 @@ jobs:
         name: oxid-with-deps
         path: oxid.tar.gz
 
+  codestyle_checks:
+    runs-on: ubuntu-latest
+    needs: install
+    container:
+      image: oxidesales/oxideshop-docker-php:7.4
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download a single artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: oxid-with-deps
+    - name: extract temp artifact
+      run: |
+        tar xzf oxid.tar.gz && mv oxid /__w
+    - name: prepare autoload
+      run: |
+        bin/symlinkProjectModules.sh
+        bin/createModuleAutoload.sh
+        cp config.inc.php-dist source/config.inc.php
+      working-directory: /__w/oxid
+
+    - name: run code checks
+      run: composer ci:codecheck
+      working-directory: /__w/oxid
+
   unit_tests:
     runs-on: ubuntu-latest
     needs: install
