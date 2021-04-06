@@ -25,7 +25,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: install
-      run: composer create-project mprokopov/test-oxid-docker /github/workspace/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
+      run: composer create-project mprokopov/test-oxid-docker /project --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
     - name: zip temp artifact
       run: |
         cd /project
