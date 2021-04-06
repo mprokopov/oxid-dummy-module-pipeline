@@ -1,0 +1,27 @@
+name: dummy oxid module pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: composer:1.10.17
+      volumes:
+        - $GITHUB_WORKSPACE/oxid:/project
+    env:
+      DB_HOST: "db"
+    # services:
+    #   db:
+    #     image: mysql:5.7
+    #     env:
+    #       MYSQL_ROOT_PASSWORD: root
+    #       MYSQL_DATABASE: oxid
+    #     ports:
+    #       - 3306
+    #     options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: install
+      run: create-project mprokopov/test-oxid-docker /project --no-interaction -s dev --repository="{\"url\": \"https://github.com/mprokopov/test-oxid-docker.git\", \"type\": \"vcs\"}" --remove-vcs
