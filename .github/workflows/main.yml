@@ -3,13 +3,12 @@ name: dummy oxid module pipeline
 on: [push]
 
 jobs:
-  build:
+  install:
     runs-on: ubuntu-latest
     container:
       image: composer:1.10.17
       volumes:
         - /home/runner/work/oxid:/project
-        - /home/runner/work/dummy-module:/project/project-modules/dummy-module
       options: "--workdir /project"
     env:
       DB_HOST: "db"
@@ -27,7 +26,26 @@ jobs:
 
     - name: install
       run: composer create-project mprokopov/test-oxid-docker /project --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
+    - name: Upload oxid-with-deps
+      uses: actions/upload-artifact@v2
+      with:
+        name: oxid
+        path: oxid
 
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: composer:1.10.17
+      volumes:
+        - /home/runner/work/oxid:/project
+        - /home/runner/work/dummy-module:/project/project-modules/dummy-module
+      options: "--workdir /project"
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download a single artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: oxid-with-deps
     - name: add project module folder
       run: composer config repositories.build path /project/project-modules/\*
 
