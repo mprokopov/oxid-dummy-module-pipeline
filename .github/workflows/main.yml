@@ -26,6 +26,15 @@ jobs:
 
     - name: install
       run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
+
+    - name: add project module folder
+      run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+      working-directory: /__w/oxid
+
+    - name: require module
+      run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
+      working-directory: /__w/oxid
+
     - name: zip temp artifact
       run: |
         tar czf oxid.tar.gz --directory /__w oxid 
@@ -40,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: install
     container:
-      image: composer:1.10.17
+      image: oxidesales/oxideshop-docker-php:7.4
       # volumes:
       #   - ${{ github.workspace }}/oxid:/project
       #   - ${{ github.workspace }}/dummy-module:/project/project-modules/dummy-module
@@ -53,11 +62,21 @@ jobs:
     - name: extract temp artifact
       run: |
         tar xzf oxid.tar.gz && mv oxid /__w
-
-    - name: add project module folder
-      run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+    - name: prepare autoload
+      run: |
+        bin/symlinkProjectModules.sh
+        bin/createModuleAutoload.sh
+        cp config.inc.php-dist source/config.inc.php
       working-directory: /__w/oxid
 
-    - name: require module
-      run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
+    - name: run unit tests
+      run: vendor/bin/phpunit --testsuite unit-tests
       working-directory: /__w/oxid
+
+    # - name: add project module folder
+    #   run: composer config repositories.build path /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/\*
+    #   working-directory: /__w/oxid
+
+    # - name: require module
+    #   run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
+    #   working-directory: /__w/oxid
