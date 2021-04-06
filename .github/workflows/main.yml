@@ -28,13 +28,13 @@ jobs:
       run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
     - name: zip temp artifact
       run: |
-        cd /__w/oxid && tar czf --exclude=oxid.tar.gz oxid.tar.gz ./ 
+        cd /__w && tar czf oxid.tar.gz oxid 
 
     - name: Upload oxid-with-deps
       uses: actions/upload-artifact@v2
       with:
         name: oxid
-        path: ${{ github.workspace }}/oxid/oxid.tar.gz
+        path: ${{ github.workspace }}/oxid.tar.gz
 
   build:
     runs-on: ubuntu-latest
