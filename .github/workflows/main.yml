@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: composer:1.10.17
+    env:
+      MODULE_NAME: oxid-professional-services/dummy
     steps:
     - uses: actions/checkout@v1
 
@@ -23,7 +25,7 @@ jobs:
       working-directory: /__w/oxid
 
     - name: require module
-      run: cd /__w/oxid && composer require --no-interaction oxid-professional-services/dummy
+      run: cd /__w/oxid && composer require --no-interaction $MODULE_NAME
       working-directory: /__w/oxid
 
     - name: zip temp artifact
