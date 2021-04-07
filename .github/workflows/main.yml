@@ -7,11 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: composer:1.10.17
-      # volumes:
-      #   - ${{ github.workspace }}/oxid:/project
-      # options: "--workdir /project"
-    env:
-      DB_HOST: "db"
     steps:
     - uses: actions/checkout@v1
 
@@ -20,7 +15,7 @@ jobs:
 
     - name: add project module folder
       run: |
-        mkdir -p project-modules && cp -r /__w/oxid-dummy-module-pipeline/oxid-dummy-module-pipeline/* project-modules 
+        mkdir -p project-modules && cp -r * project-modules 
         composer config repositories.build path /__w/oxid/project-modules/\*
       working-directory: /__w/oxid
 
