@@ -13,9 +13,12 @@ jobs:
     - name: install
       run: composer create-project mprokopov/test-oxid-docker /__w/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/mprokopov/test-oxid-docker.git\", \"type\":\"vcs\"}" --remove-vcs
 
-    - name: add project module folder
+    - name: move artifacts to projects folder
       run: |
         mkdir -p /__w/oxid/project-modules && cp -r * /__w/oxid/project-modules 
+
+    - name: add project module folder
+      run:
         composer config repositories.build path /__w/oxid/project-modules/\*
       working-directory: /__w/oxid
 
