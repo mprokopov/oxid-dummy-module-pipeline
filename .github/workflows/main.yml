@@ -15,7 +15,7 @@ jobs:
 
     - name: add project module folder
       run: |
-        mkdir -p project-modules && cp -r * project-modules 
+        mkdir -p /__w/oxid/project-modules && cp -r * /__w/oxid/project-modules 
         composer config repositories.build path /__w/oxid/project-modules/\*
       working-directory: /__w/oxid
 
